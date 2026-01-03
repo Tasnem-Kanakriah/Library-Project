@@ -12,6 +12,10 @@ Route::get('/test', function () {
     return "test route";
 });
 
+Route::get('/test/{x}', function ($x1) {
+    return "test route $x1";
+});
+
 Route::get('/categories',[
     CategoryController::class,
     'index'
@@ -20,6 +24,16 @@ Route::get('/categories',[
 Route::post('/categories',[
     CategoryController::class,
     'store'
+]);
+
+Route::put('/categories/{identifier}',[
+    CategoryController::class,
+    'update'
+]);
+
+Route::delete('/categories/{id}',[
+    CategoryController::class,
+    'destroy'
 ]);
 
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\ResponseHelper;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -14,7 +15,8 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::all();
-        return $categories;
+        // return $categories;
+        return ResponseHelper::success("جميع الكتب", $categories);
     }
 
     /**
@@ -22,16 +24,26 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        // ? first way
         // $category = Category::create([
         //     'name' => $request->name,
         // ]);
         // return response()->json($category, 201);
-
+        // ? seconde way
+        // $category = new Category();
+        // $category->name = $request->name;
+        // $category->save();
+        // // return $category;
+        // return "ok";
+        // ? seconde way with validation
+        $request->validate([
+            'name' => 'required|max:50|unique:categories'
+        ]);
         $category = new Category();
         $category->name = $request->name;
         $category->save();
         // return $category;
-        return "ok";
+        return ResponseHelper::success("تمت إضافة سجل", $category);
     }
 
     /**
@@ -39,7 +51,7 @@ class CategoryController extends Controller
      */
     public function show(string $id)
     {
-        //
+        
     }
 
     /**
@@ -47,7 +59,14 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'name' => "required|max:50|unique:categories,name,$id"
+        ]);
+        $category = Category::find($id);
+        $category->name = $request->name;
+        $category->save();
+        // return "update successful";
+        return ResponseHelper::success("تم التعديل الصنف", $category);
     }
 
     /**
@@ -55,6 +74,8 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $category = Category::find($id);
+        $category->delete();
+        return ResponseHelper::success("تم حذف الصنف", $category);
     }
-}
+} 
