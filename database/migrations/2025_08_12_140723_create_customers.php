@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
-            $table->enum('gender', ['M', 'F']);
-            $table->char('phone', 10);
+            $table->enum('gender' , ['F' , 'M'] );
             $table->date('DOB');
-            $table->string('avatar', 100)->nullable();
+            $table->char('phone' ,10);
+            $table->string('avatar' , 100)->nullable();
+
+            
             $table->foreignId('user_id')->constrained()->unique();
             $table->timestamps();
         });
