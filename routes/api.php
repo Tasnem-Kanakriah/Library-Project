@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\BookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -38,3 +39,12 @@ Route::delete('/categories/{id}',[
 
 
 
+// Route::get('/books',[
+//     CategoryController::class,
+//     'index'
+// ]);
+
+// Route::resource('books', BookController::class);
+// Route::apiResource('books', BookController::class);
+// Route::apiResource('books', BookController::class)->except('show');
+Route::apiResource('books', BookController::class)->only('show', 'destroy');

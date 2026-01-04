@@ -19,6 +19,7 @@ class CategorySeeder extends Seeder
             ['name' => 'تغذية'],
             ['name' => 'تاريخ'],
             ['name' => 'جغرافيا'],
+            ['name' => 'رسم'],
         ];
         Category::insert($categories);
     }
