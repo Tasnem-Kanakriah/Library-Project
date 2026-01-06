@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     // ? with first way in CategoryController.php
-    // protected $fillable = ['name'];
+    protected $fillable = ['name', 'image'];
     public $timestamps = false;
 }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller; 
+use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
@@ -27,10 +27,10 @@ class BookController extends Controller
     {
         // Book::create($request->all());
         // return $request->all();
-        
+
         // $book = Book::create($request->all());
         // return ResponseHelper::success("تم إضافة كتاب", $book);
-        
+
         $book = Book::create($request->all());
         if ($request->hasFile('cover')) {
             $file = $request->file('cover');
@@ -55,7 +55,15 @@ class BookController extends Controller
      */
     public function update(UpdateBookRequest $request, Book $book)
     {
-        $book->update($request->all());
+        
+        $book->update($request->except('cover'));
+        if ($request->hasFile('cover')) {
+            $file = $request->file('cover');
+            $filename = "$request->ISBN." . $file->extension();
+            Storage::putFileAs('books-images', $file, $filename);
+            $book->cover = $filename;
+            $book->save();
+        }
         return ResponseHelper::success("تم تعديل الكتاب", $book);
     }
 

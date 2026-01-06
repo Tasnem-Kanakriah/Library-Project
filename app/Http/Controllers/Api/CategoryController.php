@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\ResponseHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -16,7 +17,7 @@ class CategoryController extends Controller
     {
         $categories = Category::all();
         // return $categories;
-        return ResponseHelper::success("جميع الكتب", $categories);
+        return ResponseHelper::success("جميع الأصناف", $categories);
     }
 
     /**
@@ -36,14 +37,29 @@ class CategoryController extends Controller
         // // return $category;
         // return "ok";
         // ? seconde way with validation
+        // $request->validate([
+        //     'name' => 'required|max:50|unique:categories'
+        // ]);
+        // $category = new Category();
+        // $category->name = $request->name;
+        // $category->save();
+        // // return $category;
+        // return ResponseHelper::success("تمت إضافة سجل", $category);
+        
         $request->validate([
             'name' => 'required|max:50|unique:categories'
         ]);
-        $category = new Category();
-        $category->name = $request->name;
-        $category->save();
-        // return $category;
-        return ResponseHelper::success("تمت إضافة سجل", $category);
+        $category = Category::create([
+            'name' => $request->name,
+        ]);
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . "." . $file->extension();
+            Storage::putFileAs('categories-images', $file, $filename);
+            $category->image = $filename;
+            $category->save();
+        }
+        return ResponseHelper::success("تمت إضافة صنف جديد مع صورة ", $category);
     }
 
     /**
@@ -57,17 +73,17 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        $request->validate([
-            'name' => "required|max:50|unique:categories,name,$id"
-        ]);
-        $category = Category::find($id);
-        $category->name = $request->name;
-        $category->save();
-        // return "update successful";
-        return ResponseHelper::success("تم التعديل الصنف", $category);
-    }
+    // public function update(Request $request, string $id)
+    // {
+    //     $request->validate([
+    //         'name' => "required|max:50|unique:categories,name,$id"
+    //     ]);
+    //     $category = Category::find($id);
+    //     $category->name = $request->name;
+    //     $category->save();
+    //     // return "update successful";
+    //     return ResponseHelper::success("تم التعديل الصنف", $category);
+    // }
 
     /**
      * Remove the specified resource from storage.
