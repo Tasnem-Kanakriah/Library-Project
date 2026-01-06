@@ -51,3 +51,15 @@ Route::apiResource('books', BookController::class);
 // Route::apiResource('books', BookController::class)->only('show', 'destroy');
 
 Route::apiResource('authors', AuthorController::class);
+
+Route::get("env", function(){
+    return env('APP_NAME', 'not found');
+});
+
+Route::get("config", function(){
+    return config('app.name', 'not found');
+});
+// storage لشوف مسار الـ 
+Route::get('public-path' , function(){
+    return storage_path('app/public');
+});

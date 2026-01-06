@@ -7,6 +7,7 @@ use App\Models\Book;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\ResponseHelper;
+use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
@@ -19,13 +20,26 @@ class BookController extends Controller
         return ResponseHelper::success("جميع الكتب", $books);
     }
 
-
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreBookRequest $request)
     {
-        //
+        // Book::create($request->all());
+        // return $request->all();
+        
+        // $book = Book::create($request->all());
+        // return ResponseHelper::success("تم إضافة كتاب", $book);
+        
+        $book = Book::create($request->all());
+        if ($request->hasFile('cover')) {
+            $file = $request->file('cover');
+            $filename = "$request->ISBN." . $file->extension();
+            Storage::putFileAs('books-images', $file, $filename);
+            $book->cover = $filename;
+            $book->save();
+        }
+        return ResponseHelper::success("تم إضافة كتاب", $book);
     }
 
     /**
@@ -41,7 +55,8 @@ class BookController extends Controller
      */
     public function update(UpdateBookRequest $request, Book $book)
     {
-        //
+        $book->update($request->all());
+        return ResponseHelper::success("تم تعديل الكتاب", $book);
     }
 
     /**
@@ -50,5 +65,6 @@ class BookController extends Controller
     public function destroy(Book $book)
     {
         $book->delete();
+        return ResponseHelper::success("تم حذف الكتاب", $book);
     }
 }
