@@ -55,7 +55,6 @@ class BookController extends Controller
      */
     public function update(UpdateBookRequest $request, Book $book)
     {
-        
         $book->update($request->except('cover'));
         if ($request->hasFile('cover')) {
             $file = $request->file('cover');

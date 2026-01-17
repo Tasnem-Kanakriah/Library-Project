@@ -13,11 +13,18 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // public function index()
+    // {
+    //     $categories = Category::all();
+    //     // return $categories;
+    //     return ResponseHelper::success("جميع الأصناف", $categories);
+    // }
     public function index()
     {
-        $categories = Category::all();
-        // return $categories;
-        return ResponseHelper::success("جميع الأصناف", $categories);
+        // $categories = Category::withAvg('books', 'price')->get();
+        // $categories = Category::withMax('books', 'price')->get();
+        $categories = Category::withCount('books')->get();
+        return ResponseHelper::success("جميع الأصناف مع عدد الكتب لكل صنف", $categories);
     }
 
     /**
@@ -73,17 +80,17 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    // public function update(Request $request, string $id)
-    // {
-    //     $request->validate([
-    //         'name' => "required|max:50|unique:categories,name,$id"
-    //     ]);
-    //     $category = Category::find($id);
-    //     $category->name = $request->name;
-    //     $category->save();
-    //     // return "update successful";
-    //     return ResponseHelper::success("تم التعديل الصنف", $category);
-    // }
+    public function update(Request $request, string $id)
+    {
+        $request->validate([
+            'name' => "required|max:50|unique:categories,name,$id"
+        ]);
+        $category = Category::find($id);
+        $category->name = $request->name;
+        $category->save();
+        // return "update successful";
+        return ResponseHelper::success("تم التعديل الصنف", $category);
+    }
 
     /**
      * Remove the specified resource from storage.

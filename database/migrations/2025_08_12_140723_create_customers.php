@@ -17,8 +17,6 @@ return new class extends Migration
             $table->date('DOB');
             $table->char('phone' ,10);
             $table->string('avatar' , 100)->nullable();
-
-            
             $table->foreignId('user_id')->constrained()->unique();
             $table->timestamps();
         });

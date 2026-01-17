@@ -10,4 +10,9 @@ class Author extends Model
     /** @use HasFactory<\Database\Factories\AuthorFactory> */
     use HasFactory;
     public $timestamps = false;
+
+    
+    function books() {
+        return $this->belongsToMany(Book::class);
+    }
 }
