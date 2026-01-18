@@ -16,7 +16,7 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Book::all();
+        $books = Book::with('category')->with('authors')->get();
         return ResponseHelper::success("جميع الكتب", $books);
     }
 
