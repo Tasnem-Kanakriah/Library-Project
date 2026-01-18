@@ -59,14 +59,18 @@ class CategoryController extends Controller
         $category = Category::create([
             'name' => $request->name,
         ]);
+        // todo : doesn't work !
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . "." . $file->extension();
             Storage::putFileAs('categories-images', $file, $filename);
             $category->image = $filename;
             $category->save();
+            return ResponseHelper::success("تمت إضافة صنف جديد مع صورة ", $category);
         }
-        return ResponseHelper::success("تمت إضافة صنف جديد مع صورة ", $category);
+        else {
+            return ResponseHelper::success("تمت إضافة صنف جديد بدون صورة ", $category);
+        }
     }
 
     /**
@@ -97,8 +101,17 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        $category = Category::find($id);
-        $category->delete();
-        return ResponseHelper::success("تم حذف الصنف", $category);
+        // $category = Category::find($id);
+        // $category->delete();
+        // return ResponseHelper::success("تم حذف الصنف", $category);
+
+        $category = Category::where('id', $id)->withCount('books')->first();
+        if ($category->books_count > 0) {
+            return ResponseHelper::failed("لا يمكن حذف هذا الصنف لوجود كتب مرتبطة به", $category);
+        }
+        else {
+            $category->delete();
+            return ResponseHelper::success("تم حذف الصنف", $category);
+        }
     }
-} 
+}
