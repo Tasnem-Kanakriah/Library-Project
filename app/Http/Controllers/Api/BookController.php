@@ -64,7 +64,9 @@ class BookController extends Controller
             $book->cover = $filename;
             $book->save();
         }
-        return ResponseHelper::success("تم تعديل الكتاب", $book);
+        $book->authors()->sync($request->authors);
+        // return ResponseHelper::success("تم تعديل الكتاب", $book);
+        return $request;
     }
 
     /**

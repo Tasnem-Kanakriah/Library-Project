@@ -24,17 +24,19 @@ class UpdateBookRequest extends FormRequest
     {
         return [
             'ISBN' => [
-                'required',
+                'sometimes',
                 'string',
                 'size:13',
                 Rule::unique('books', 'ISBN')->ignore($this->book->id),
             ],
-            'title' => 'required|string|max:70',
+            'title' => 'sometimes|string|max:70',
             'price' => 'nullable|numeric|min:0|max:99.99',
-            'mortgage' => 'required|numeric|min:0|max:9999.99',
+            'mortgage' => 'sometimes|numeric|min:0|max:9999.99',
             'cover' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'authorship_date' => 'nullable|date',
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'sometimes|exists:categories,id',
+            'authors' => 'array',
+            'authors.*' => 'integer|exists:authors,id'
         ];
     }
 }
