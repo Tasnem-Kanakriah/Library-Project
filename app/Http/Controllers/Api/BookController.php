@@ -48,7 +48,7 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        $book = Book::where('id', $book->id)->with('category')->with('authors')->get(); 
+        $book = Book::where('id', $book->id)->with('category')->with('authors')->get();
         return $book;
     }
 
@@ -59,6 +59,9 @@ class BookController extends Controller
     {
         $book->update($request->except('cover'));
         if ($request->hasFile('cover')) {
+            if ($book->cover !== null) {
+                Storage::delete('books-images/' . $book->cover);
+            }
             $file = $request->file('cover');
             $filename = "$request->ISBN." . $file->extension();
             Storage::putFileAs('books-images', $file, $filename);
@@ -75,6 +78,9 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
+        if ($book->cover !== null) {
+            Storage::delete('books-images/' . $book->cover);
+        }
         $book->delete();
         return ResponseHelper::success("تم حذف الكتاب", $book);
     }
