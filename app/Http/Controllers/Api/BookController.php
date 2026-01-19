@@ -48,6 +48,7 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
+        $book = Book::where('id', $book->id)->with('category')->with('authors')->get();
         return $book;
     }
 
@@ -65,8 +66,8 @@ class BookController extends Controller
             $book->save();
         }
         $book->authors()->sync($request->authors);
-        // return ResponseHelper::success("تم تعديل الكتاب", $book);
-        return $request;
+        return ResponseHelper::success("تم تعديل الكتاب", $book);
+        // return $request;
     }
 
     /**
