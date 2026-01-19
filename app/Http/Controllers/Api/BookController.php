@@ -48,7 +48,7 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        $book = Book::where('id', $book->id)->with('category')->with('authors')->get();
+        $book = Book::where('id', $book->id)->with('category')->with('authors')->get(); 
         return $book;
     }
 
