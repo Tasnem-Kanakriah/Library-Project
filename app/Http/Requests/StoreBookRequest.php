@@ -29,6 +29,8 @@ class StoreBookRequest extends FormRequest
             'cover' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'authorship_date' => 'nullable|date',
             'category_id' => 'required|exists:categories,id',
+            'authors' => 'array',
+            'authors.*' => 'integer|exists:authors,id'
         ];
     }
 }

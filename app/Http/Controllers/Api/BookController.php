@@ -39,6 +39,7 @@ class BookController extends Controller
             $book->cover = $filename;
             $book->save();
         }
+        $book->authors()->attach($request->authors);
         return ResponseHelper::success("تم إضافة كتاب", $book);
     }
 
@@ -47,7 +48,7 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        //
+        return $book;
     }
 
     /**
