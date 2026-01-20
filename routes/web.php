@@ -11,6 +11,10 @@ Route::get('/', function () {
 
 // 1-m *********** One to Many relation 
 
+Route::get('1-m-parent/{book}', function (Book $book) {
+    return $book->category;
+});
+
 Route::get('1-m-child', function () {
     $category = Category::find(1);
     return $category->books; // بترجع الكتب يلي الـ id = 5

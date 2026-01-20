@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\ResponseHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
@@ -19,12 +20,17 @@ class CategoryController extends Controller
     //     // return $categories;
     //     return ResponseHelper::success("جميع الأصناف", $categories);
     // }
-    public function index()
+    public function index(Request $request)
     {
-        // $categories = Category::withAvg('books', 'price')->get();
-        // $categories = Category::withMax('books', 'price')->get();
-        $categories = Category::withCount('books')->get();
-        return ResponseHelper::success("جميع الأصناف مع عدد الكتب لكل صنف", $categories);
+        // // $categories = Category::withAvg('books', 'price')->get();
+        // // $categories = Category::withMax('books', 'price')->get();
+        // $categories = Category::withCount('books')->get();
+        // // App::setLocale('en');
+        // $locale = $request->header('Accept-Language') ?? 'ar';
+        // // $locale = $request->getLanguage();
+        // app()->setLocale($locale);
+        // // return $locale;
+        // return ResponseHelper::success(trans('library.all-categories'), $categories);
     }
 
     /**
