@@ -24,13 +24,16 @@ class CategoryController extends Controller
     {
         // // $categories = Category::withAvg('books', 'price')->get();
         // // $categories = Category::withMax('books', 'price')->get();
-        // $categories = Category::withCount('books')->get();
-        // // App::setLocale('en');
+        
+        $categories = Category::withCount('books')->get();
+
         // $locale = $request->header('Accept-Language') ?? 'ar';
-        // // $locale = $request->getLanguage();
-        // app()->setLocale($locale);
-        // // return $locale;
-        // return ResponseHelper::success(trans('library.all-categories'), $categories);
+        // $locale = $request->getLanguages();
+        // return $locale[0] ?? 'ar';
+        // // App::setLocale('en');
+        // app()->setLocale($locale[0] ?? 'ar');
+        
+        return ResponseHelper::success(trans('library.all-categories'), $categories);
     }
 
     /**

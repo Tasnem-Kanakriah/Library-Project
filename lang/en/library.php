@@ -1,10 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 return [
-    'all-categories' => 'All Categories'
-
+    'all-categories' => 'All Categories',
 ];
-
-?>

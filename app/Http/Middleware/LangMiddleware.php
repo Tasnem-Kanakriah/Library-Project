@@ -16,9 +16,10 @@ class LangMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         // $locale = $request->header('Accept-Language') ?? 'ar';
+        // app()->setLocale($locale[0] ?? 'ar');
+        
         $locale = $request->getLanguages();
-        // dd($locale);
-        app()->setLocale($locale[0]);
+        app()->setLocale($locale[0] ?? 'ar');
         return $next($request);
     }
 }
