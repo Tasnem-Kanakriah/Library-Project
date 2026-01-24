@@ -17,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // middleware for 'api' routes
         $middleware->appendToGroup('api', App\Http\Middleware\LangMiddleware::class);
+
+        // $middleware->alias('lang', App\Http\Middleware\LangMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
     })->create();

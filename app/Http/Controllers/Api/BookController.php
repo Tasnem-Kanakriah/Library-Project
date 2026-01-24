@@ -63,16 +63,31 @@ class BookController extends Controller
         // ->get();
         // return ResponseHelper::success("جميع الكتب", BookResource::collection($books));
 
+        // $title = $request->title;
+        // $books = Book::select('id', "ISBN", 'title', 'cover', 'price', 'mortgage', 'category_id')
+        // ->when($title, function ($query) use ($title) {
+        //     return $query->where('title', 'like', "%$title%");
+        // })
+        // ->with(['category', 'authors:name'])
+        // ->orderBy('id')
+        // ->get();
+        // // return ResponseHelper::success("جميع الكتب", $books);
+        // return ResponseHelper::success("جميع الكتب", BookResource::collection($books));
+        
         $title = $request->title;
         $books = Book::select('id', "ISBN", 'title', 'cover', 'price', 'mortgage', 'category_id')
         ->when($title, function ($query) use ($title) {
             return $query->where('title', 'like', "%$title%");
         })
+        // ->with(['category'])
         ->with(['category', 'authors:name'])
         ->orderBy('id')
-        ->get();
-        return ResponseHelper::success("جميع الكتب", $books);
+        ->paginate(7);
+        // ->get();
+        // ->paginate(7);
+        // return $books;
         // return ResponseHelper::success("جميع الكتب", BookResource::collection($books));
+        return ResponseHelper::success("جميع الكتب", $books);
     }
 
     /**
@@ -89,7 +104,7 @@ class BookController extends Controller
         $book = Book::create($request->all());
         if ($request->hasFile('cover')) {
             $file = $request->file('cover');
-            $filename = Str::uuid() ."." . $file->extension();
+            $filename = Str::uuid() . "." . $file->extension();
             Storage::putFileAs('books-images', $file, $filename);
             $book->cover = $filename;
             $book->save();

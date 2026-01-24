@@ -25,14 +25,39 @@ class CategoryController extends Controller
         // // $categories = Category::withAvg('books', 'price')->get();
         // // $categories = Category::withMax('books', 'price')->get();
         
-        $categories = Category::withCount('books')->get();
+        // $categories = Category::withCount('books')->get();
+        
+        // $categories = Category::withCount('books')->whereHas('books')->get();
+        
+        // $categories = Category::withCount('books')->whereHas('books', function ($query) {
+        //     return  $query->where('price', '=', 23.4);
+        // })->get();
 
+        // ? جيب التصنيفات يلي فيها كتب أغلى من 90 مع عدد الكتب الكلي لهالتصنيف بعيدا عن الشرط 
+        // $categories = Category::withCount('books')
+        // ->whereHas('books', fn ($query) => $query->where('price', '>', 90))
+        // ->get();
+
+        // ? لجلب الكتب مع كل تصنيف
+        // $categories = Category::with('books')->get(); 
+        
+        // ? لجلب الكتب يلي سعرها أعلى من سبعين التابعة لكل تصنيف 
+        // $categories = Category::with(['books' => fn($q)=>$q->where('price','>',70)])->get();
+
+        // يجلب فقط التصنيفات التي تحتوي كتب أعلى من 70 ويجلب كتبها التي تحقق نفس الشرط، كتب أغلى من 70
+        $categories = Category::with(['books' => fn ($query) => $query->where('price', '>', 70)])
+        ->whereHas('books', fn ($query) => $query->where('price', '>', 70))
+        ->get();
+
+        // $categories = Category::pluck('name');
+
+        // Middleware هاد الكود صار بالـ 
         // $locale = $request->header('Accept-Language') ?? 'ar';
         // $locale = $request->getLanguages();
         // return $locale[0] ?? 'ar';
         // // App::setLocale('en');
         // app()->setLocale($locale[0] ?? 'ar');
-        
+
         return ResponseHelper::success(trans('library.all-categories'), $categories);
     }
 
