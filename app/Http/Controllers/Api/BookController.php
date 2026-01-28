@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BookRequest;
 use App\Models\Book;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
@@ -82,8 +83,8 @@ class BookController extends Controller
         // ->with(['category'])
         ->with(['category', 'authors:name'])
         ->orderBy('id')
-        ->paginate(7);
-        // ->get();
+        // ->paginate(7);
+        ->get();
         // ->paginate(7);
         // return $books;
         // return ResponseHelper::success("جميع الكتب", BookResource::collection($books));
@@ -93,23 +94,35 @@ class BookController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreBookRequest $request)
+    public function store(BookRequest $request)
     {
         // Book::create($request->all());
         // return $request->all();
 
         // $book = Book::create($request->all());
         // return ResponseHelper::success("تم إضافة كتاب", $book);
-
-        $book = Book::create($request->all());
+        // ! ---------------
+        // $book = Book::create($request->all());
+        // if ($request->hasFile('cover')) {
+        //     $file = $request->file('cover');
+        //     $filename = Str::uuid() . "." . $file->extension();
+        //     Storage::putFileAs('books-images', $file, $filename);
+        //     $book->cover = $filename;
+        //     $book->save();
+        // }
+        // $book->authors()->attach($request->authors);
+        // return ResponseHelper::success("تم إضافة كتاب", $book);
+        // ! ---------------
+        $validated = $request->validated();
         if ($request->hasFile('cover')) {
             $file = $request->file('cover');
             $filename = Str::uuid() . "." . $file->extension();
             Storage::putFileAs('books-images', $file, $filename);
-            $book->cover = $filename;
-            $book->save();
+            $validated['cover'] = $filename;
         }
-        $book->authors()->attach($request->authors);
+        $book = Book::create($validated);
+        $book->authors()->attach($validated['authors'] ?? []);
+        $book->load(['category', 'authors']);
         return ResponseHelper::success("تم إضافة كتاب", $book);
     }
 
@@ -119,28 +132,43 @@ class BookController extends Controller
     public function show(Book $book)
     {
         $book = $book->load(['category:id,name', 'authors:name']);
-        return ResponseHelper::success('تم إعادة معلومات الكتاب', $book);
+        return ResponseHelper::success('تم إعادة معلومات الكتاب', new BookResource($book));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBookRequest $request, Book $book)
+    public function update(BookRequest $request, Book $book)
     {
-        $book->update($request->except('cover'));
+        // $book->update($request->except('cover'));
+        // if ($request->hasFile('cover')) {
+        //     if ($book->cover !== null) {
+        //         Storage::delete('books-images/' . $book->cover);
+        //     }
+        //     $file = $request->file('cover');
+        //     $filename = Str::uuid() . "." . $file->extension();
+        //     Storage::putFileAs('books-images', $file, $filename);
+        //     $book->cover = $filename;
+        //     $book->save();
+        // }
+        // $book->authors()->sync($request->authors);
+        // return ResponseHelper::success("تم تعديل الكتاب", $book);
+        // ! ---------------
+        $validated = $request->validated();
         if ($request->hasFile('cover')) {
-            if ($book->cover !== null) {
-                Storage::delete('books-images/' . $book->cover);
-            }
             $file = $request->file('cover');
             $filename = Str::uuid() . "." . $file->extension();
+            if ($book->cover !== null) {
+                Storage::delete("books-images/$book->cover");
+            }
             Storage::putFileAs('books-images', $file, $filename);
-            $book->cover = $filename;
+            $validated['cover'] = $filename;
             $book->save();
         }
-        $book->authors()->sync($request->authors);
+        $book->update($validated);
+        $book->authors()->sync($validated['authors'] ?? []);
+        $book->load(['category', 'authors']);
         return ResponseHelper::success("تم تعديل الكتاب", $book);
-        // return $request;
     }
 
     /**

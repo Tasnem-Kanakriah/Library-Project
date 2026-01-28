@@ -42,8 +42,6 @@ Route::delete('/categories/{id}', [
     'destroy'
 ]);
 
-
-
 // Route::get('/books',[
 //     CategoryController::class,
 //     'index'

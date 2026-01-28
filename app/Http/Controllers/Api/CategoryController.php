@@ -8,6 +8,7 @@ use App\ResponseHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
@@ -24,11 +25,11 @@ class CategoryController extends Controller
     {
         // // $categories = Category::withAvg('books', 'price')->get();
         // // $categories = Category::withMax('books', 'price')->get();
-        
+
         // $categories = Category::withCount('books')->get();
-        
+
         // $categories = Category::withCount('books')->whereHas('books')->get();
-        
+
         // $categories = Category::withCount('books')->whereHas('books', function ($query) {
         //     return  $query->where('price', '=', 23.4);
         // })->get();
@@ -38,16 +39,19 @@ class CategoryController extends Controller
         // ->whereHas('books', fn ($query) => $query->where('price', '>', 90))
         // ->get();
 
+        // ? جلب كل الكتب
+        $categories = Category::all();
+
         // ? لجلب الكتب مع كل تصنيف
         // $categories = Category::with('books')->get(); 
-        
+
         // ? لجلب الكتب يلي سعرها أعلى من سبعين التابعة لكل تصنيف 
         // $categories = Category::with(['books' => fn($q)=>$q->where('price','>',70)])->get();
 
-        // يجلب فقط التصنيفات التي تحتوي كتب أعلى من 70 ويجلب كتبها التي تحقق نفس الشرط، كتب أغلى من 70
-        $categories = Category::with(['books' => fn ($query) => $query->where('price', '>', 70)])
-        ->whereHas('books', fn ($query) => $query->where('price', '>', 70))
-        ->get();
+        // ! يجلب فقط التصنيفات التي تحتوي كتب أعلى من 70 ويجلب كتبها التي تحقق نفس الشرط، كتب أغلى من 70
+        // $categories = Category::with(['books' => fn($query) => $query->where('price', '>', 70)])
+        //     ->whereHas('books', fn($query) => $query->where('price', '>', 70))
+        //     ->get();
 
         // $categories = Category::pluck('name');
 
@@ -86,34 +90,50 @@ class CategoryController extends Controller
         // $category->save();
         // // return $category;
         // return ResponseHelper::success("تمت إضافة سجل", $category);
-        
+
+        // !
         $request->validate([
-            'name' => 'required|max:50|unique:categories'
+            'name' => 'required|max:50|unique:categories',
+            'image' => 'nullable|image'
         ]);
         $category = Category::create([
             'name' => $request->name,
         ]);
-        // todo : doesn't work !
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . "." . $file->extension();
             Storage::putFileAs('categories-images', $file, $filename);
-            $category->image = $filename;
+            $category->image = asset('storage/categories-images/' . $filename);
             $category->save();
             return ResponseHelper::success("تمت إضافة صنف جديد مع صورة ", $category);
-        }
-        else {
+        } else {
             return ResponseHelper::success("تمت إضافة صنف جديد بدون صورة ", $category);
         }
+
+        //! حل الانسة
+        // $request->validate([
+        //     'name' => 'required|max:50|unique:categories',
+        //     'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048'
+        // ]);
+        // $category = new Category();
+        // $category->name = $request->name;
+        // if ($request->hasFile('image')) {
+        //     $file = $request->file('image');
+        //     $filename = time() . '_' . $file->getClientOriginalName();
+        //     $path = $file->storeAs('categories-images', $filename, 'public'); // تخزين في public disk
+        //     $category->image = $path; // احفظ الـ path كامل
+        // }
+        // $category->save();
+        // return ResponseHelper::success(
+        //     isset($category->image) ? "تمت إضافة صنف جديد مع صورة" : "تمت إضافة صنف جديد بدون صورة",
+        //     $category
+        // );
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        
-    }
+    public function show(string $id) {}
 
     /**
      * Update the specified resource in storage.
@@ -121,13 +141,25 @@ class CategoryController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => "required|max:50|unique:categories,name,$id"
+            'name' => "required|max:50|unique:categories,name,$id",
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048'
         ]);
-        $category = Category::find($id);
+        $category = Category::findOrFail($id);
         $category->name = $request->name;
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = Str::uuid() . ".". $file->extension();
+            Storage::putFileAs('categories-images', $file, $filename);
+            // $path = $file->storeAs('categories-images', $filename, 'public');
+
+            if ($category->image) {
+                $oldPath = str_replace(asset('storage/'), '', $category->image);
+                Storage::disk('public')->delete($oldPath);
+            }
+            $category->image = asset("storage/categories-images/$filename");
+        }
         $category->save();
-        // return "update successful";
-        return ResponseHelper::success("تم التعديل الصنف", $category);
+        return ResponseHelper::success("تم تعديل الصنف بنجاح", $category);
     }
 
     /**
@@ -142,8 +174,7 @@ class CategoryController extends Controller
         $category = Category::where('id', $id)->withCount('books')->first();
         if ($category->books_count > 0) {
             return ResponseHelper::failed("لا يمكن حذف هذا الصنف لوجود كتب مرتبطة به", $category);
-        }
-        else {
+        } else {
             $category->delete();
             return ResponseHelper::success("تم حذف الصنف", $category);
         }
