@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\UserType;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,6 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('api', App\Http\Middleware\LangMiddleware::class);
 
         // $middleware->alias('lang', App\Http\Middleware\LangMiddleware::class);
+
+        $middleware->statefulApi(); 
+
+        $middleware->alias([
+            'user-type' => UserType::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
     })->create();
